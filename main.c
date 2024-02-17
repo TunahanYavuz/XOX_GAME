@@ -6,7 +6,9 @@ int Rand_O();
 int Control();
 int Winner();
 int Spaces[9]={0,0,0,0,0,0,0,0,0};
-
+int player=2;
+int PC=1;
+int difficulty=0;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int main ()
@@ -25,7 +27,7 @@ int main ()
 
     HWND hwnd = CreateWindowEx(
             0, wc.lpszClassName, "XOX Game", WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, 195, 260,
+            CW_USEDEFAULT, CW_USEDEFAULT, 240, 260,
             NULL, NULL, wc.hInstance, NULL
     );
 
@@ -49,7 +51,7 @@ int main ()
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
+    static HWND ListBox;
     switch (uMsg) {
         case WM_CLOSE:
             if (MessageBox(hwnd, "Kapatmak Istiyor Musun?", "UYARI", MB_YESNO) == IDYES) {
@@ -75,7 +77,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 buttonText[1]='\0';
                 for (int j = 0; j < 3; ++j) {
                     CreateWindowEx(0, "Edit", "",
-                                   WS_CHILD | WS_VISIBLE| ES_AUTOHSCROLL | WS_BORDER | WS_DISABLED,
+                                   WS_CHILD | WS_VISIBLE| WS_BORDER | WS_DISABLED,
                                    3 + (j * 30), 5 + (i * 30), 30, 30, hwnd, (HMENU)(9+menuNum),
                                    GetModuleHandle(0), 0);
                     CreateWindowEx(0, "Button", (LPCSTR)buttonText,
@@ -85,6 +87,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     menuNum++;
                 }
             }
+            CreateWindowEx(0,"STATIC","Zorluk Ayari",
+                           WS_CHILD|WS_VISIBLE,
+                           140,60,80,20,hwnd,(HMENU)29,
+                           GetModuleHandle(0),0);
+            ListBox=CreateWindowEx(0,"LISTBOX",NULL,
+                           WS_CHILD|WS_VISIBLE | LBS_STANDARD|LBS_NOTIFY,
+                           140,90,80,40,hwnd,(HMENU)33
+                           , GetModuleHandle(0),0);
+            SendMessage(ListBox,LB_ADDSTRING,0,(LPARAM)"EzCerEz");
+            SendMessage(ListBox,LB_ADDSTRING,0,(LPARAM)"ZOR");
+
             break;
 
 
@@ -127,7 +140,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 }
                 int PC_Rnd=Rand_O();
                 SendMessage(GetDlgItem(hwnd,PC_Rnd+9),WM_SETTEXT,0,(LPARAM)"O");
-                Spaces[PC_Rnd]=1;
+                Spaces[PC_Rnd]=PC;
                 winner=Winner();
                 if (winner){
                     if (winner==2){
@@ -143,6 +156,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     break;
                 }
 
+            }
+            if(HIWORD(wParam) == LBN_SELCHANGE) {
+                switch (HIWORD(wParam)) {
+                    case LBN_SELCHANGE: {
+                        // ListBox'ta seçili öğe değiştiğinde yapılacak işlemler
+                        int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
+                        difficulty=selectedIndex;
+                        if (selectedIndex != LB_ERR) {
+                            // Seçilen öğenin indeksini aldık, şimdi metnini alalım
+                            char selectedText[256];
+                            SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
+                            MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
+                        }
+                        break;
+                    }
+                }
             }
         break;
 
@@ -160,7 +189,38 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
 
 }
-int Rand_O(){
+int Rand_O() {
+    if (difficulty == 1){
+        if (Spaces[4] == player && Spaces[8] == player && Spaces[0] == 0)
+            return 0;
+        if (Spaces[0] == player && Spaces[8] == player && Spaces[4] == 0)
+            return 4;
+        if (Spaces[0] == player && Spaces[4] == player && Spaces[8] == 0)
+            return 8;
+        if (Spaces[2] == player && Spaces[4] == player && Spaces[6] == 0)
+            return 6;
+        if (Spaces[4] == player && Spaces[6] == player && Spaces[2] == 0)
+            return 2;
+        if (Spaces[2] == player && Spaces[6] == player && Spaces[4] == 0)
+            return 4;
+        for (int i = 0; i < 7; i += 3) {
+            if (Spaces[i + 1] == player && Spaces[i + 2] == player && Spaces[i] == 0)
+                return i;
+            if (Spaces[i] == player && Spaces[i + 2] == player && Spaces[i + 1] == 0)
+                return (i + 1);
+            if (Spaces[i] == player && Spaces[i + 1] == player && Spaces[i + 2] == 0)
+                return (i + 2);
+        }
+        for (int i = 0; i < 3; ++i) {
+
+            if (Spaces[i + 3] == player && Spaces[i + 6] == player && Spaces[i] == 0)
+                return i;
+            if (Spaces[i] == player && Spaces[i + 6] == player && Spaces[i + 3] == 0)
+                return i + 3;
+            if (Spaces[i] == player && Spaces[i + 3] == player && Spaces[i + 6] == 0)
+                return i + 6;
+        }
+    }
     int randNum=rand()%9;
     while(Spaces[randNum]!=0){
         randNum=rand()%9;
