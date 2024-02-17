@@ -25,7 +25,7 @@ int main ()
 
     HWND hwnd = CreateWindowEx(
             0, wc.lpszClassName, "XOX Game", WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, 235, 305,
+            CW_USEDEFAULT, CW_USEDEFAULT, 195, 260,
             NULL, NULL, wc.hInstance, NULL
     );
 
@@ -34,7 +34,7 @@ int main ()
         return 0;
     }
 
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+    ShowWindow(hwnd, SW_SHOW);
 
 
 
@@ -61,13 +61,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         case WM_CREATE:
-            CreateWindowEx(0,"Edit","Isaretleme Kismi",
-                           WS_CHILD|WS_VISIBLE|WS_DISABLED,
-                           3,100,110,10,hwnd,(HMENU)31,
+            CreateWindowEx(0,"STATIC","Isaretleme Kismi",
+                           WS_CHILD|WS_VISIBLE,
+                           3,100,110,20,hwnd,(HMENU)31,
                            GetModuleHandle(0),0);
-            CreateWindowEx(0,"Edit","<---",
-                           WS_CHILD|WS_VISIBLE|WS_DISABLED,
-                           100,140,23,10,hwnd,(HMENU)32,
+            CreateWindowEx(0,"STATIC","<---",
+                           WS_CHILD|WS_VISIBLE,
+                           100,140,23,20,hwnd,(HMENU)32,
                            GetModuleHandle(0),0);
             for (int menuNum = 0, i = 0; i < 3; ++i) {
                 wchar_t buttonText[2];
@@ -94,7 +94,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (HIWORD(wParam) == BN_CLICKED) {
                 wchar_t butonMetni[2];
                 int butonId = LOWORD(wParam);
-                printf("%d",butonId);
                 if (Spaces[butonId]!=0){
                     MessageBox(NULL,"Bolme Bos Degil","HATA",MB_ICONERROR);
                     break;
