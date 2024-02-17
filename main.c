@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <stdio.h>
 #include <math.h>
 #include <time.h>
 int Rand_O();
@@ -105,15 +104,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
         case WM_COMMAND:
             if (HIWORD(wParam) == BN_CLICKED) {
-                wchar_t butonMetni[2];
-                int butonId = LOWORD(wParam);
-                if (Spaces[butonId]!=0){
+                wchar_t buttonText[2];
+                int buttonId = LOWORD(wParam);
+                if (Spaces[buttonId] != 0){
                     MessageBox(NULL,"Bolme Bos Degil","HATA",MB_ICONERROR);
                     break;
                 }
-                GetWindowText(GetDlgItem(hwnd, butonId), (LPSTR) butonMetni, 2);
-                SendMessage(GetDlgItem(hwnd, butonId + 9), WM_SETTEXT, 0, (LPARAM)butonMetni);
-                Spaces[butonId]=2;
+                GetWindowText(GetDlgItem(hwnd, buttonId), (LPSTR) buttonText, 2);
+                SendMessage(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM)buttonText);
+                Spaces[buttonId]=2;
                 int winner=Winner();
                 if (winner){
                     if (winner==2){
@@ -160,15 +159,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if(HIWORD(wParam) == LBN_SELCHANGE) {
                 switch (HIWORD(wParam)) {
                     case LBN_SELCHANGE: {
-                        // ListBox'ta seçili öğe değiştiğinde yapılacak işlemler
+
                         int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
                         difficulty=selectedIndex;
-                        if (selectedIndex != LB_ERR) {
-                            // Seçilen öğenin indeksini aldık, şimdi metnini alalım
-                            char selectedText[256];
-                            SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
-                            MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
-                        }
+
+                        char selectedText[256];
+                        SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
+                        MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
+
                         break;
                     }
                 }
