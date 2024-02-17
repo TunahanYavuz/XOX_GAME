@@ -1,9 +1,15 @@
 #include <windows.h>
 #include <math.h>
 #include <time.h>
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 int Rand_O();
 int Control();
 int Winner();
+void Clean(HWND hwnd);
+void PrintWinner(int winnerNum);
 int Spaces[9]={0,0,0,0,0,0,0,0,0};
 int player=2;
 int PC=1;
@@ -12,6 +18,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int main ()
 {
+    SetConsoleOutputCP(CP_UTF8);
     srand(time(NULL));
     const char Game[]  = "XOX Game";
 
@@ -53,7 +60,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     static HWND ListBox;
     switch (uMsg) {
         case WM_CLOSE:
-            if (MessageBox(hwnd, "Kapatmak Istiyor Musun?", "UYARI", MB_YESNO) == IDYES) {
+            if (MessageBoxW(hwnd, L"Kapatmak İstiyor Musun?", L"UYARI", MB_YESNO) == IDYES) {
                 DestroyWindow(hwnd);
             }
             return 0;
@@ -62,112 +69,85 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         case WM_CREATE:
-            CreateWindowEx(0,"STATIC","Isaretleme Kismi",
-                           WS_CHILD|WS_VISIBLE,
-                           3,100,110,20,hwnd,(HMENU)31,
-                           GetModuleHandle(0),0);
-            CreateWindowEx(0,"STATIC","<---",
-                           WS_CHILD|WS_VISIBLE,
-                           100,140,23,20,hwnd,(HMENU)32,
-                           GetModuleHandle(0),0);
+            CreateWindowExW(0, L"STATIC", L"İşaretleme Kısmı",
+                            WS_CHILD | WS_VISIBLE,
+                            3, 100, 110, 20, hwnd, (HMENU) 31,
+                            GetModuleHandle(0), 0);
+            CreateWindowExW(0, L"STATIC", L"<---",
+                            WS_CHILD | WS_VISIBLE,
+                            100, 140, 23, 20, hwnd, (HMENU) 32,
+                            GetModuleHandle(0), 0);
             for (int menuNum = 0, i = 0; i < 3; ++i) {
                 wchar_t buttonText[2];
-                buttonText[0]='X';
-                buttonText[1]='\0';
+                buttonText[0] = 'X';
+                buttonText[1] = '\0';
                 for (int j = 0; j < 3; ++j) {
-                    CreateWindowEx(0, "Edit", "",
-                                   WS_CHILD | WS_VISIBLE| WS_BORDER | WS_DISABLED,
-                                   3 + (j * 30), 5 + (i * 30), 30, 30, hwnd, (HMENU)(9+menuNum),
-                                   GetModuleHandle(0), 0);
-                    CreateWindowEx(0, "Button", (LPCSTR)buttonText,
-                                    WS_VISIBLE|WS_CHILD|WS_BORDER|BS_PUSHBUTTON,
-                                   3 + (j * 30), 120 + (i * 30), 30, 30, hwnd, (HMENU)(0+menuNum),
-                                   GetModuleHandle(0), 0);
+                    CreateWindowExW(0, L"Edit", L"",
+                                    WS_CHILD | WS_VISIBLE | WS_BORDER | WS_DISABLED,
+                                    3 + (j * 30), 5 + (i * 30), 30, 30, hwnd, (HMENU) (9 + menuNum),
+                                    GetModuleHandle(0), 0);
+                    CreateWindowExW(0, L"Button", (LPCWSTR) buttonText,
+                                    WS_VISIBLE | WS_CHILD | WS_BORDER | BS_PUSHBUTTON,
+                                    3 + (j * 30), 120 + (i * 30), 30, 30, hwnd, (HMENU) (0 + menuNum),
+                                    GetModuleHandle(0), 0);
                     menuNum++;
                 }
             }
-            CreateWindowEx(0,"STATIC","Zorluk Ayari",
-                           WS_CHILD|WS_VISIBLE,
-                           140,60,80,20,hwnd,(HMENU)29,
-                           GetModuleHandle(0),0);
-            ListBox=CreateWindowEx(0,"LISTBOX",NULL,
-                           WS_CHILD|WS_VISIBLE | LBS_STANDARD|LBS_NOTIFY,
-                           140,90,80,40,hwnd,(HMENU)33
-                           , GetModuleHandle(0),0);
-            SendMessage(ListBox,LB_ADDSTRING,0,(LPARAM)"EzCerEz");
-            SendMessage(ListBox,LB_ADDSTRING,0,(LPARAM)"ZOR");
+            CreateWindowExW(0, L"STATIC", L"Zorluk Ayarı",
+                            WS_CHILD | WS_VISIBLE,
+                            140, 60, 80, 20, hwnd, (HMENU) 29,
+                            GetModuleHandle(0), 0);
+            ListBox = CreateWindowExW(0, L"LISTBOX", NULL,
+                                      WS_CHILD | WS_VISIBLE | LBS_NOTIFY,
+                                      140, 90, 80, 40, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
+            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"EzCerEz");
+            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ZOR");
 
             break;
-
-
 
 
         case WM_COMMAND:
             if (HIWORD(wParam) == BN_CLICKED) {
                 wchar_t buttonText[2];
                 int buttonId = LOWORD(wParam);
-                if (Spaces[buttonId] != 0){
-                    MessageBox(NULL,"Bolme Bos Degil","HATA",MB_ICONERROR);
+                if (Spaces[buttonId] != 0) {
+                    MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
                     break;
                 }
-                GetWindowText(GetDlgItem(hwnd, buttonId), (LPSTR) buttonText, 2);
-                SendMessage(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM)buttonText);
-                Spaces[buttonId]=2;
-                int winner=Winner();
-                if (winner){
-                    if (winner==2){
-                        MessageBox(NULL,"OYUNU KAZANDINIZ","OYUN BITTI",MB_ICONINFORMATION);
-                    } else
-                        MessageBox(NULL,"OYUNU KAYBETTINIZ","OYUN BITTI",MB_ICONINFORMATION);
-                    for (int i = 0; i <= 8; ++i) {
-                        SetWindowText(GetDlgItem(hwnd,i+9),"");
-                    }
-                    for (int i = 0; i <=8 ; ++i) {
-                        Spaces[i]=0;
-                    }
+                GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
+                SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
+                Spaces[buttonId] = 2;
+                if(Winner()){
+                    Clean(hwnd);
                     break;
                 }
-                if(Control()){
-                    MessageBox(NULL,"OYUN BERABERE BITTI","OYUN BITTI",MB_ICONINFORMATION);
-                    for (int i = 0; i <= 8; ++i) {
-                        SetWindowText(GetDlgItem(hwnd,i+9),"");
-                    }
-                    for (int i = 0; i <=8 ; ++i) {
-                        Spaces[i]=0;
-                    }
+
+                if (Control()) {
+                    MessageBoxW(NULL, L"Oyun Berabere Bitti", L"Oyun Bitti", MB_ICONINFORMATION);
+                    Clean(hwnd);
                     break;
                 }
-                int PC_Rnd=Rand_O();
-                SendMessage(GetDlgItem(hwnd,PC_Rnd+9),WM_SETTEXT,0,(LPARAM)"O");
-                Spaces[PC_Rnd]=PC;
-                winner=Winner();
-                if (winner){
-                    if (winner==2){
-                        MessageBox(NULL,"OYUNU KAZANDINIZ","OYUN BITTI",MB_ICONINFORMATION);
-                    } else
-                        MessageBox(NULL,"OYUNU KAYBETTINIZ","OYUN BITTI",MB_ICONINFORMATION);
-                    for (int i = 0; i <= 8; ++i) {
-                        SetWindowText(GetDlgItem(hwnd,i+9),"");
-                    }
-                    for (int i = 0; i <=8 ; ++i) {
-                        Spaces[i]=0;
-                    }
+                int PC_Rnd = Rand_O();
+                SendMessage(GetDlgItem(hwnd, PC_Rnd + 9), WM_SETTEXT, 0, (LPARAM) "O");
+                Spaces[PC_Rnd] = PC;
+                if(Winner()){
+                    Clean(hwnd);
                     break;
                 }
+
 
             }
-            if(HIWORD(wParam) == LBN_SELCHANGE) {
+            if (HIWORD(wParam) == LBN_SELCHANGE) {
                 int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
-                difficulty=selectedIndex;
+                difficulty = selectedIndex;
 
-                char selectedText[256];
-                SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
-                MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
+                wchar_t selectedText[256];
+                SendMessageW(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
+                MessageBoxW(hwnd, selectedText, L"Zorluk Modu", MB_OK | MB_ICONINFORMATION);
 
                 break;
             }
-        break;
-
+            break;
 
 
         case WM_PAINT: {
@@ -175,13 +155,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             HDC hdc = BeginPaint(hwnd, &ps);
             FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW + 6));
             EndPaint(hwnd, &ps);
-        break;
+            break;
         }
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
-
 }
+
+
+
 int Rand_O() {
     if (difficulty == 1){
         if (Spaces[4] == player && Spaces[8] == player && Spaces[0] == 0)
@@ -235,23 +217,48 @@ int Control(){
 int Winner(){
     for (int i = 0; i < 7;i+=3) {
         for (int j = 1; j <=2 ; ++j) {
-            if (Spaces[i]==j&&Spaces[i+1]==j&&Spaces[i+2]==j)
-                return j;
+            if (Spaces[i]==j&&Spaces[i+1]==j&&Spaces[i+2]==j){
+                PrintWinner(j);
+                return 1;
+            }
         }
-
     }
     for (int i = 0; i < 3; ++i) {
         for (int j = 1; j <=2 ; ++j) {
-            if (Spaces[i]==j&&Spaces[i+3]==j&&Spaces[i+6]==j)
-                return j;
+            if (Spaces[i] == j && Spaces[i + 3] == j && Spaces[i + 6] == j){
+                PrintWinner(j);
+                return 1;
+            }
         }
 
     }
     for (int i = 1; i <=2 ; ++i) {
-        if(Spaces[0]==i&&Spaces[4]==i&&Spaces[8]==i)
-            return i;
-        if (Spaces[2]==i&&Spaces[4]==i&&Spaces[6]==i)
-            return i;
+        if(Spaces[0]==i&&Spaces[4]==i&&Spaces[8]==i){
+            PrintWinner(i);
+            return 1;
+        }
+        if (Spaces[2]==i&&Spaces[4]==i&&Spaces[6]==i){
+            PrintWinner(i);
+            return 1;
+        }
     }
     return 0;
+}
+void PrintWinner(int winnerNum){
+    switch (winnerNum) {
+        case 1:
+            MessageBoxW(NULL,L"Oyunu Kaybettiniz",L"Oyun Bitti",MB_ICONINFORMATION);
+            break;
+        case 2:
+            MessageBoxW(NULL,L"Oyunu Kazandınız",L"Oyun Bitti",MB_ICONINFORMATION);
+            break;
+        default:
+            break;
+    }
+}
+void Clean(HWND hwnd){
+    for (int i = 0; i <= 8; ++i) {
+        SetWindowText(GetDlgItem(hwnd, i + 9), "");
+    }
+    memset(Spaces, 0, sizeof(Spaces));
 }
