@@ -157,19 +157,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
             }
             if(HIWORD(wParam) == LBN_SELCHANGE) {
-                switch (HIWORD(wParam)) {
-                    case LBN_SELCHANGE: {
+                int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
+                difficulty=selectedIndex;
 
-                        int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
-                        difficulty=selectedIndex;
+                char selectedText[256];
+                SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
+                MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
 
-                        char selectedText[256];
-                        SendMessage(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
-                        MessageBox(hwnd, selectedText, "Zorluk Modu", MB_OK | MB_ICONINFORMATION);
-
-                        break;
-                    }
-                }
+                break;
             }
         break;
 
