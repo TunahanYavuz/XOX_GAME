@@ -72,7 +72,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             CreateWindowExW(0, L"STATIC", L"İşaretleme Kısmı",
                             WS_CHILD | WS_VISIBLE,
                             3, 100, 110, 20, hwnd, (HMENU) 31,
-                            GetModuleHandle(0), 0);
+                            NULL, 0);
             CreateWindowExW(0, L"STATIC", L"<---",
                             WS_CHILD | WS_VISIBLE,
                             100, 140, 23, 20, hwnd, (HMENU) 32,
@@ -87,7 +87,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                                     3 + (j * 30), 5 + (i * 30), 30, 30, hwnd, (HMENU) (9 + menuNum),
                                     GetModuleHandle(0), 0);
                     CreateWindowExW(0, L"Button", (LPCWSTR) buttonText,
-                                    WS_VISIBLE | WS_CHILD | WS_BORDER | BS_PUSHBUTTON,
+                                    WS_VISIBLE|WS_CHILD|WS_BORDER|BS_PUSHBUTTON,
                                     3 + (j * 30), 120 + (i * 30), 30, 30, hwnd, (HMENU) (0 + menuNum),
                                     GetModuleHandle(0), 0);
                     menuNum++;
@@ -98,10 +98,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                             140, 60, 80, 20, hwnd, (HMENU) 29,
                             GetModuleHandle(0), 0);
             ListBox = CreateWindowExW(0, L"LISTBOX", NULL,
-                                      WS_CHILD | WS_VISIBLE | LBS_NOTIFY,
-                                      140, 90, 80, 40, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
+                                      WS_CHILD|WS_VISIBLE|WS_BORDER|LBS_NOTIFY,
+                                      140, 90, 80, 60, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
             SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"EzCerEz");
             SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ZOR");
+            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"İMKANLI");
 
             break;
 
@@ -116,7 +117,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 }
                 GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
                 SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
-                Spaces[buttonId] = 2;
+                Spaces[buttonId] = player;
                 if(Winner()){
                     Clean(hwnd);
                     break;
@@ -165,7 +166,37 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 
 int Rand_O() {
-    if (difficulty == 1){
+    if (difficulty == 1||difficulty==2){
+        if (Spaces[4] == PC && Spaces[8] == PC && Spaces[0] == 0)
+            return 0;
+        if (Spaces[0] == PC && Spaces[8] == PC && Spaces[4] == 0)
+            return 4;
+        if (Spaces[0] == PC && Spaces[4] == PC && Spaces[8] == 0)
+            return 8;
+        if (Spaces[2] == PC && Spaces[4] == PC && Spaces[6] == 0)
+            return 6;
+        if (Spaces[4] == PC && Spaces[6] == PC && Spaces[2] == 0)
+            return 2;
+        if (Spaces[2] == PC && Spaces[6] == PC && Spaces[4] == 0)
+            return 4;
+        for (int i = 0; i < 7; i += 3) {
+            if (Spaces[i + 1] == PC && Spaces[i + 2] == PC && Spaces[i] == 0)
+                return i;
+            if (Spaces[i] == PC && Spaces[i + 2] == PC && Spaces[i + 1] == 0)
+                return (i + 1);
+            if (Spaces[i] == PC && Spaces[i + 1] == PC && Spaces[i + 2] == 0)
+                return (i + 2);
+        }
+        for (int i = 0; i < 3; ++i) {
+
+            if (Spaces[i + 3] == PC && Spaces[i + 6] == PC && Spaces[i] == 0)
+                return i;
+            if (Spaces[i] == PC && Spaces[i + 6] == PC && Spaces[i + 3] == 0)
+                return i + 3;
+            if (Spaces[i] == PC && Spaces[i + 3] == PC && Spaces[i + 6] == 0)
+                return i + 6;
+        }
+
         if (Spaces[4] == player && Spaces[8] == player && Spaces[0] == 0)
             return 0;
         if (Spaces[0] == player && Spaces[8] == player && Spaces[4] == 0)
@@ -195,6 +226,24 @@ int Rand_O() {
             if (Spaces[i] == player && Spaces[i + 3] == player && Spaces[i + 6] == 0)
                 return i + 6;
         }
+        if(difficulty==2){
+            for (int i = 0; i <9 ; i+=2) {
+                if(Spaces[i]==player&&Spaces[4]==0)
+                    return 4;
+                if(i==2)
+                    i+=2;
+            }
+            if (Spaces[1]==player && Spaces[5]==player&&Spaces[2]==0)
+                return 2;
+            if (Spaces[1]==player && Spaces[3]==player&&Spaces[0]==0)
+                return 0;
+            if (Spaces[7]==player && Spaces[5]==player&&Spaces[8]==0)
+                return 8;
+            if (Spaces[7]==player && Spaces[3]==player&&Spaces[6]==0)
+                return 6;
+        }
+
+
     }
     int randNum=rand()%9;
     while(Spaces[randNum]!=0){
