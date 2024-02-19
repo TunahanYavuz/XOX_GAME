@@ -238,19 +238,15 @@ int Rand_O() {
                 return 8;
             if (Spaces[7]==player && Spaces[3]==player&&Spaces[6]==0)
                 return 6;
-            if (Spaces[0]==player&&Spaces[5]==player&&Spaces[2]==0)
-                return 2;
-            if (Spaces[2]==player&&Spaces[3]==player&&Spaces[0]==0)
+            if (((Spaces[2]==player&&Spaces[3]==player)||(Spaces[6]==player&&Spaces[1]==player))&&Spaces[0]==0)
                 return 0;
-            if (Spaces[8]==player&&Spaces[3]==player&&Spaces[6]==0)
+            if (((Spaces[0]==player&&Spaces[5]==player)||(Spaces[8]==player&&Spaces[1]==player))&&Spaces[2]==0)
+                return 2;
+            if (((Spaces[3]==player&&Spaces[8]==player)||(Spaces[0]==player&&Spaces[7]==player))&&Spaces[6]==0)
                 return 6;
-            if (Spaces[6]==player&&Spaces[5]==player&&Spaces[8]==0)
+            if (((Spaces[5]==player&&Spaces[6]==player)||(Spaces[2]==player&&Spaces[7]==player))&&Spaces[8]==0)
                 return 8;
-
-
-
         }
-
 
     }
     int randNum=rand()%9;
