@@ -162,9 +162,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
 }
-
-
-
 int Rand_O() {
     if (difficulty == 1||difficulty==2){
         if (Spaces[4] == PC && Spaces[8] == PC && Spaces[0] == 0)
@@ -241,6 +238,17 @@ int Rand_O() {
                 return 8;
             if (Spaces[7]==player && Spaces[3]==player&&Spaces[6]==0)
                 return 6;
+            if (Spaces[0]==player&&Spaces[5]==player&&Spaces[2]==0)
+                return 2;
+            if (Spaces[2]==player&&Spaces[3]==player&&Spaces[0]==0)
+                return 0;
+            if (Spaces[8]==player&&Spaces[3]==player&&Spaces[6]==0)
+                return 6;
+            if (Spaces[6]==player&&Spaces[5]==player&&Spaces[8]==0)
+                return 8;
+
+
+
         }
 
 
@@ -291,6 +299,7 @@ int Winner(){
             return 1;
         }
     }
+
     return 0;
 }
 void PrintWinner(int winnerNum){
