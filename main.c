@@ -224,12 +224,10 @@ int Rand_O() {
                 return i + 6;
         }
         if(difficulty==2){
-            for (int i = 0; i <9 ; i+=2) {
-                if(Spaces[i]==player&&Spaces[4]==0)
-                    return 4;
-                if(i==2)
-                    i+=2;
-            }
+
+            if(Spaces[4]==0)
+                return 4;
+
             if (Spaces[1]==player && Spaces[5]==player&&Spaces[2]==0)
                 return 2;
             if (Spaces[1]==player && Spaces[3]==player&&Spaces[0]==0)
