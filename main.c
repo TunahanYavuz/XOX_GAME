@@ -101,8 +101,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                                       WS_CHILD|WS_VISIBLE|WS_BORDER|LBS_NOTIFY,
                                       140, 90, 80, 60, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
             SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"EzCerEz");
+            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ORTA");
             SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ZOR");
-            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"İMKANLI");
 
             break;
 
@@ -245,7 +245,6 @@ int Rand_O() {
             if (((Spaces[5]==player&&Spaces[6]==player)||(Spaces[2]==player&&Spaces[7]==player))&&Spaces[8]==0)
                 return 8;
         }
-
     }
     int randNum=rand()%9;
     while(Spaces[randNum]!=0){
