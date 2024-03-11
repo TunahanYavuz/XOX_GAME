@@ -16,7 +16,7 @@ int player2=2;
 int PC=2;
 int difficulty=0;
 int gameMode=0;
-int textcontrol=0;
+int textControl=0;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int main ()
@@ -125,7 +125,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (HIWORD(wParam) == BN_CLICKED) {
                 wchar_t buttonText[2];
                 int buttonId = LOWORD(wParam);
-                if (gameMode == 1 && textcontrol == 0) {
+                if (gameMode == 1 && textControl == 0) {
                     if (Spaces[buttonId] != 0) {
                         MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
                         break;
@@ -146,8 +146,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     for (int i = 0; i < 9; ++i) {
                         SendMessage(GetDlgItem(hwnd, i), WM_SETTEXT, 0, (LPARAM) "O");
                     }
-                    textcontrol = 1;
-                } else if (gameMode == 1 && textcontrol == 1) {
+                    textControl = 1;
+                } else if (gameMode == 1 && textControl == 1) {
                     if (Spaces[buttonId] != 0) {
                         MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
                         break;
@@ -168,7 +168,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     for (int i = 0; i < 9; ++i) {
                         SendMessage(GetDlgItem(hwnd, i), WM_SETTEXT, 0, (LPARAM) "X");
                     }
-                    textcontrol = 0;
+                    textControl = 0;
                 }
                 if (gameMode==0){
 
@@ -381,10 +381,10 @@ void PrintWinner(int winnerNum){
     if(gameMode==0){
         switch (winnerNum) {
             case 1:
-                MessageBoxW(NULL,L"Oyunu Kaybettiniz",L"Oyun Bitti",MB_ICONINFORMATION);
+                MessageBoxW(NULL,L"Oyunu Kazandınız",L"Oyun Bitti",MB_ICONINFORMATION);
                 break;
             case 2:
-                MessageBoxW(NULL,L"Oyunu Kazandınız",L"Oyun Bitti",MB_ICONINFORMATION);
+                MessageBoxW(NULL,L"Oyunu Kaybettiniz",L"Oyun Bitti",MB_ICONINFORMATION);
                 break;
             default:
                 break;
