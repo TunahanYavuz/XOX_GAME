@@ -11,9 +11,12 @@ int Winner();
 void Clean(HWND hwnd);
 void PrintWinner(int winnerNum);
 int Spaces[9]={0,0,0,0,0,0,0,0,0};
-int player=2;
-int PC=1;
+int player=1;
+int player2=2;
+int PC=2;
 int difficulty=0;
+int gameMode=0;
+int textcontrol=0;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int main ()
@@ -57,7 +60,7 @@ int main ()
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    static HWND ListBox;
+    static HWND ListBox1,ListBox2;
     switch (uMsg) {
         case WM_CLOSE:
             if (MessageBoxW(hwnd, L"Kapatmak İstiyor Musun?", L"UYARI", MB_YESNO) == IDYES) {
@@ -95,14 +98,25 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             }
             CreateWindowExW(0, L"STATIC", L"Zorluk Ayarı",
                             WS_CHILD | WS_VISIBLE,
-                            140, 60, 80, 20, hwnd, (HMENU) 29,
+                            140, 5, 80, 20, hwnd, (HMENU) 29,
                             GetModuleHandle(0), 0);
-            ListBox = CreateWindowExW(0, L"LISTBOX", NULL,
+            ListBox1 = CreateWindowExW(0, L"LISTBOX", NULL,
                                       WS_CHILD|WS_VISIBLE|WS_BORDER|LBS_NOTIFY,
-                                      140, 90, 80, 60, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
-            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"EzCerEz");
-            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ORTA");
-            SendMessageW(ListBox, LB_ADDSTRING, 0, (LPARAM) L"ZOR");
+                                      140, 30, 80, 60, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
+
+            SendMessageW(ListBox1, LB_ADDSTRING, 0, (LPARAM) L"EzCerEz");
+            SendMessageW(ListBox1, LB_ADDSTRING, 0, (LPARAM) L"ORTA");
+            SendMessageW(ListBox1, LB_ADDSTRING, 0, (LPARAM) L"ZOR");
+            CreateWindowExW(0, L"STATIC", L"Oyun Modu",
+                            WS_CHILD | WS_VISIBLE,
+                            140, 95, 80, 20, hwnd, (HMENU) 29,
+                            GetModuleHandle(0), 0);
+            ListBox2 = CreateWindowExW(0, L"LISTBOX", NULL,
+                                       WS_CHILD|WS_VISIBLE|WS_BORDER|LBS_NOTIFY,
+                                       140, 120, 80, 40, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
+            SendMessageW(ListBox2, LB_ADDSTRING, 0, (LPARAM) L"Bilgisayar");
+            SendMessageW(ListBox2, LB_ADDSTRING, 0, (LPARAM) L"2V2");
+
 
             break;
 
@@ -111,41 +125,104 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (HIWORD(wParam) == BN_CLICKED) {
                 wchar_t buttonText[2];
                 int buttonId = LOWORD(wParam);
-                if (Spaces[buttonId] != 0) {
-                    MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
-                    break;
-                }
-                GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
-                SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
-                Spaces[buttonId] = player;
-                if(Winner()){
-                    Clean(hwnd);
-                    break;
-                }
+                if (gameMode == 1 && textcontrol == 0) {
+                    if (Spaces[buttonId] != 0) {
+                        MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
+                        break;
+                    }
+                    GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
+                    SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
+                    Spaces[buttonId] = player;
+                    if (Winner()) {
+                        Clean(hwnd);
+                        break;
+                    }
 
-                if (Control()) {
-                    MessageBoxW(NULL, L"Oyun Berabere Bitti", L"Oyun Bitti", MB_ICONINFORMATION);
-                    Clean(hwnd);
-                    break;
-                }
-                int PC_Rnd = Rand_O();
-                SendMessage(GetDlgItem(hwnd, PC_Rnd + 9), WM_SETTEXT, 0, (LPARAM) "O");
-                Spaces[PC_Rnd] = PC;
-                if(Winner()){
-                    Clean(hwnd);
-                    break;
-                }
+                    if (Control()) {
+                        MessageBoxW(NULL, L"Oyun Berabere Bitti", L"Oyun Bitti", MB_ICONINFORMATION);
+                        Clean(hwnd);
+                        break;
+                    }
+                    for (int i = 0; i < 9; ++i) {
+                        SendMessage(GetDlgItem(hwnd, i), WM_SETTEXT, 0, (LPARAM) "O");
+                    }
+                    textcontrol = 1;
+                } else if (gameMode == 1 && textcontrol == 1) {
+                    if (Spaces[buttonId] != 0) {
+                        MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
+                        break;
+                    }
+                    GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
+                    SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
+                    Spaces[buttonId] = player2;
+                    if (Winner()) {
+                        Clean(hwnd);
+                        break;
+                    }
 
+                    if (Control()) {
+                        MessageBoxW(NULL, L"Oyun Berabere Bitti", L"Oyun Bitti", MB_ICONINFORMATION);
+                        Clean(hwnd);
+                        break;
+                    }
+                    for (int i = 0; i < 9; ++i) {
+                        SendMessage(GetDlgItem(hwnd, i), WM_SETTEXT, 0, (LPARAM) "X");
+                    }
+                    textcontrol = 0;
+                }
+                if (gameMode==0){
 
+                    if (Spaces[buttonId] != 0) {
+                        MessageBoxW(NULL, L"Bölme Boş Değil", L"HATA", MB_ICONERROR);
+                        break;
+                    }
+                    GetWindowTextW(GetDlgItem(hwnd, buttonId), (LPWSTR) buttonText, 2);
+                    SendMessageW(GetDlgItem(hwnd, buttonId + 9), WM_SETTEXT, 0, (LPARAM) buttonText);
+                    Spaces[buttonId] = player;
+                    if (Winner()) {
+                        Clean(hwnd);
+                        break;
+                    }
+
+                    if (Control()) {
+                        MessageBoxW(NULL, L"Oyun Berabere Bitti", L"Oyun Bitti", MB_ICONINFORMATION);
+                        Clean(hwnd);
+                        break;
+                    }
+
+                    int PC_Rnd = Rand_O();
+                    SendMessage(GetDlgItem(hwnd, PC_Rnd + 9), WM_SETTEXT, 0, (LPARAM) "O");
+                    Spaces[PC_Rnd] = PC;
+                    if (Winner()) {
+                        Clean(hwnd);
+                        break;
+                    }
+
+                }
             }
             if (HIWORD(wParam) == LBN_SELCHANGE) {
-                int selectedIndex = SendMessage(ListBox, LB_GETCURSEL, 0, 0);
-                difficulty = selectedIndex;
+                int selectedIndex1 = SendMessage(ListBox1, LB_GETCURSEL, 0, 0);
+                int selectedIndex2 = SendMessage(ListBox2, LB_GETCURSEL, 0, 0);
+                if(selectedIndex1!=LB_ERR&&selectedIndex2==LB_ERR){
+                    difficulty = selectedIndex1;
 
-                wchar_t selectedText[256];
-                SendMessageW(ListBox, LB_GETTEXT, selectedIndex, (LPARAM) selectedText);
-                MessageBoxW(hwnd, selectedText, L"Zorluk Modu", MB_OK | MB_ICONINFORMATION);
-
+                    wchar_t selectedText[256];
+                    SendMessageW(ListBox1, LB_GETTEXT, selectedIndex1, (LPARAM) selectedText);
+                    MessageBoxW(hwnd, selectedText, L"Zorluk Modu", MB_OK | MB_ICONINFORMATION);
+                    Clean(hwnd);
+                }
+                else if(selectedIndex1==LB_ERR&&selectedIndex2!=LB_ERR){
+                    gameMode = selectedIndex2;
+                    wchar_t selectedText[256];
+                    SendMessageW(ListBox2,LB_GETTEXT,selectedIndex2,(LPARAM)selectedText);
+                    MessageBoxW(hwnd,selectedText,L"Oyun Modu",MB_OK|MB_ICONINFORMATION);
+                    if(selectedIndex2==0){
+                        for (int i = 0; i < 9; ++i) {
+                            SendMessage(GetDlgItem(hwnd, i), WM_SETTEXT, 0, (LPARAM) "X");
+                        }
+                    }
+                    Clean(hwnd);
+                }
                 break;
             }
             break;
@@ -158,6 +235,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             EndPaint(hwnd, &ps);
             break;
         }
+        case WM_KEYDOWN:
+            if(GetKeyState(VK_CONTROL)&&(wParam=='r'||wParam=='R')){
+                Clean(hwnd);}
+        break;
+
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
@@ -296,15 +378,28 @@ int Winner(){
     return 0;
 }
 void PrintWinner(int winnerNum){
-    switch (winnerNum) {
-        case 1:
-            MessageBoxW(NULL,L"Oyunu Kaybettiniz",L"Oyun Bitti",MB_ICONINFORMATION);
-            break;
-        case 2:
-            MessageBoxW(NULL,L"Oyunu Kazandınız",L"Oyun Bitti",MB_ICONINFORMATION);
-            break;
-        default:
-            break;
+    if(gameMode==0){
+        switch (winnerNum) {
+            case 1:
+                MessageBoxW(NULL,L"Oyunu Kaybettiniz",L"Oyun Bitti",MB_ICONINFORMATION);
+                break;
+            case 2:
+                MessageBoxW(NULL,L"Oyunu Kazandınız",L"Oyun Bitti",MB_ICONINFORMATION);
+                break;
+            default:
+                break;
+        }
+    }
+    if(gameMode==1){
+        switch (winnerNum) {
+            case 1:
+                MessageBoxW(NULL,L"1. Oyuncu Kazandı \"X\"",L"Oyun Bitti",MB_ICONINFORMATION);
+                break;
+            case 2:
+                MessageBoxW(NULL,L"2. Oyuncu Kazandı \"O\"",L"Oyun Bitti",MB_ICONINFORMATION);                break;
+            default:
+                break;
+        }
     }
 }
 void Clean(HWND hwnd){
