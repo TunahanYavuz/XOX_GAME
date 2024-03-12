@@ -116,10 +116,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                                        140, 120, 80, 40, hwnd, (HMENU) 33, GetModuleHandle(0), 0);
             SendMessageW(ListBox2, LB_ADDSTRING, 0, (LPARAM) L"Bilgisayar");
             SendMessageW(ListBox2, LB_ADDSTRING, 0, (LPARAM) L"1v1");
-
-
             break;
-
 
         case WM_COMMAND:
             if (HIWORD(wParam) == BN_CLICKED) {
