@@ -17,6 +17,7 @@ int PC=2;
 int difficulty=0;
 int gameMode=0;
 int textControl=0;
+int listControl1=-1,listControl2=-1;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int main ()
@@ -200,16 +201,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (HIWORD(wParam) == LBN_SELCHANGE) {
                 int selectedIndex1 = SendMessage(ListBox1, LB_GETCURSEL, 0, 0);
                 int selectedIndex2 = SendMessage(ListBox2, LB_GETCURSEL, 0, 0);
-                if(selectedIndex1!=LB_ERR&&selectedIndex2==LB_ERR){
-                    difficulty = selectedIndex1;
 
+                if(selectedIndex1!=LB_ERR && listControl1 != selectedIndex1){
+                    difficulty = selectedIndex1;
+                    listControl1=selectedIndex1;
                     wchar_t selectedText[256];
                     SendMessageW(ListBox1, LB_GETTEXT, selectedIndex1, (LPARAM) selectedText);
                     MessageBoxW(hwnd, selectedText, L"Zorluk Modu", MB_OK | MB_ICONINFORMATION);
                     Clean(hwnd);
+
                 }
-                else if(selectedIndex1==LB_ERR&&selectedIndex2!=LB_ERR){
+                else if(selectedIndex2!=LB_ERR && listControl2 != selectedIndex2){
                     gameMode = selectedIndex2;
+                    listControl2=selectedIndex2;
                     wchar_t selectedText[256];
                     SendMessageW(ListBox2,LB_GETTEXT,selectedIndex2,(LPARAM)selectedText);
                     MessageBoxW(hwnd,selectedText,L"Oyun Modu",MB_OK|MB_ICONINFORMATION);
@@ -219,7 +223,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                         }
                     }
                     Clean(hwnd);
+
                 }
+
                 break;
             }
             break;
